@@ -1,0 +1,66 @@
+
+//+------------------------------------------------------------------+
+//|                                                       ADR Alert Dashboard MT5 |
+//|                                        https://forexroboteasy.com |
+//|                                                       Forex Robot Easy Team |
+//+------------------------------------------------------------------+
+
+// Define input parameters
+input double ADR_Period = 14; // Period for calculating Average Daily Range (ADR)
+input double ADR_Multiplier = 1.5; // Multiplier for custom levels above ADR
+
+// Define global variables
+double adr; // Average Daily Range
+double upperLevel; // Custom upper level for alerts
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   // Calculate Average Daily Range (ADR)
+   adr = iATR(_Symbol, PERIOD_D1, ADR_Period);
+   
+   // Calculate custom upper level for alerts
+   upperLevel = adr * ADR_Multiplier;
+   
+   // Return initialization result
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+   // Perform any necessary cleanup tasks
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   // Loop through the price data
+   for(int i = prev_calculated; i < rates_total; i++)
+   {
+      // Check if price exceeds upper level
+      if(high[i] > upperLevel)
+      {
+         // Generate alert
+         Alert('Price exceeds ADR: ', DoubleToString(high[i], _Digits));
+      }
+   }
+   
+   // Return new prev_calculated value
+   return(rates_total);
+}
